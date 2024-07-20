@@ -2,7 +2,10 @@ package me.api.bankapi;
 
 import me.api.bankapi.apis.RevolutAPI;
 import me.api.bankapi.enums.revolut.RevolutPermissions;
+import org.json.JSONObject;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.awt.*;
 
 @SpringBootApplication
 public class BankAPI {
@@ -19,7 +22,7 @@ public class BankAPI {
 					.setIsSandbox(true)
 					.setClientID("21c31458-0a66-4ac6-8093-f45e2aba7146")
 					.setKid("-zGZ5dHlNlSb9j3EHlm7PO_V_vg")
-					.setAccessToken("oa_sand_uBfiqH58__kjbWX0pxNN6bnSZ3EfywzUSTZ3tiuXSfQ")
+					.setAccessToken("oa_sand_kXkM6jjAJxxiKVk2xSpBZJiSm4ctNGSXdgHCdJFPTpU")
 					.setPermissions(RevolutPermissions.READ_ACCOUNT_BASIC,
 							RevolutPermissions.READ_ACCOUNT_DETAIL,
 							RevolutPermissions.READ_BALANCES,
@@ -37,10 +40,10 @@ public class BankAPI {
 //			System.out.println(revolutAPI.getJWTParameters("https://127.0.0.1:5500",
 //					consent.getJSONObject("Data").getString("ConsentId")));
 //			System.out.println(revolutAPI.getConsentURL("https://google.com"));
-//			System.out.println(revolutAPI.getAccessToken("oa_sand_g78btPBVYrJ_2yvIf-lL67mcDgUSADQ40mD6BYaQSEw"));
-//			System.out.println(revolutAPI.getAccountsRaw());
+//			System.out.println(revolutAPI.getAccessToken("oa_sand_kHCrGWdZooiz5YTnmkJGvrdRQl2vfSTGDoi_eWc7TIs"));
+			System.out.println(revolutAPI.getAccountsRaw());
 			System.out.println(revolutAPI.getAccounts());
-//			System.out.println(revolutAPI.getBalance("03b7dc99-39c8-4d56-b145-af71065ea532"));
+			System.out.println(revolutAPI.getBalance("03b7dc99-39c8-4d56-b145-af71065ea532"));
 			System.out.println(revolutAPI.getBeneficiaries("03b7dc99-39c8-4d56-b145-af71065ea532"));
 		} catch (Exception e) {
 			throw new RuntimeException(e);

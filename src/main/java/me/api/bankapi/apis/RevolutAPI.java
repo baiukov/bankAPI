@@ -17,6 +17,7 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 import java.io.*;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
@@ -33,13 +34,14 @@ import java.util.*;
 
 public class RevolutAPI {
 
+    private final RevolutRowMapper rowMapper = new RevolutRowMapper();
     private X509Certificate transportCertificate;
 
     private PrivateKey privateKey;
 
     private TrustManagerFactory trustManagerFactory;
 
-    private boolean isSandbox;
+    private final boolean isSandbox;
     private String clientID;
 
     private SSLContext sslContext;
@@ -54,11 +56,9 @@ public class RevolutAPI {
     private final List<RevolutPermissions> consentPermissions = new ArrayList<>();
 
     private final String sandboxTokenURL = "https://sandbox-oba-auth.revolut.com/token";
-    private final String sandboxConsentURL = "https://sandbox-oba.revolut.com/account-access-consents";
     private final String sandboxUserConsentURL = "https://sandbox-oba.revolut.com/ui/index.html?response_type=code%%20id_token&scope=accounts&redirect_uri=%s&client_id=%s&request=%s&state=example_state";
     private final String sandboxURL = "https://sandbox-oba.revolut.com/";
     private final String prodTokenURL = "https://oba-auth.revolut.com/token";
-    private final String prodConsentURL = "https://oba.revolut.com/account-access-consents";
     private final String prodUserConsentURL = "https://oba.revolut.com/ui/index.html?response_type=code%20id_token&scope=accounts&redirect_uri=%s&client_id=%s&request=%s&state=example_state";
     private final String prodURL = "https://oba.revolut.com/";
 
@@ -416,7 +416,7 @@ public class RevolutAPI {
     }
 
     public String getConsent(String token) throws IOException {
-        URL url = new URL(isSandbox ? sandboxConsentURL : prodConsentURL);
+        URL url = new URL(String.format("%s%s", isSandbox ? sandboxURL : prodURL, "account-access-consents"));
         HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
         connection.setSSLSocketFactory(sslContext.getSocketFactory());
         connection.setRequestMethod("POST");
@@ -557,72 +557,39 @@ public class RevolutAPI {
     }
 
     public String getAccountsRaw() throws IOException {
-        URL url = new URL((isSandbox ? sandboxURL : prodURL) + "accounts");
-        HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-        connection.setRequestProperty("Authorization", "Bearer " + accessToken);
-        connection.setRequestProperty("x-fapi-financial-id", "001580000103UAvAAM");
-
-        // Read the response
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            return response.toString();
-        }
+        return sendRequest((isSandbox ? sandboxURL : prodURL) + "accounts");
     }
 
     public List<RevolutAccount> getAccounts() throws IOException {
-        return RevolutRowMapper.getAccounts(getAccountsRaw());
+        return rowMapper.getAccounts(rowMapper.parse(getAccountsRaw()));
     }
 
     public String getAccountRaw(String accountID) throws IOException {
-        URL url = new URL(String.format("%s/accounts/%s", isSandbox ? sandboxURL : prodURL, accountID));
-        HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-        connection.setRequestProperty("Authorization", "Bearer " + accessToken);
-        connection.setRequestProperty("x-fapi-financial-id", "001580000103UAvAAM");
-
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            return response.toString();
-        }
+        return sendRequest(String.format("%s/accounts/%s", isSandbox ? sandboxURL : prodURL, accountID))        ;
     }
 
     public RevolutAccount getAccount(String accountID) throws IOException {
-        return RevolutRowMapper.getAccounts(getAccountRaw(accountID)).stream().findFirst().orElse(null);
+        return rowMapper.getAccounts(rowMapper.parse(getAccountRaw(accountID))).stream().findFirst().orElse(null);
     }
 
     public String getBalanceRaw(String accountID) throws IOException {
-        URL url = new URL(String.format("%saccounts/%s/balances", isSandbox ? sandboxURL : prodURL, accountID));
-        HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
-        connection.setRequestMethod("GET");
-        connection.setRequestProperty("Authorization", "Bearer " + accessToken);
-        connection.setRequestProperty("x-fapi-financial-id", "001580000103UAvAAM");
-
-        // Read the response
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
-            String inputLine;
-            StringBuilder response = new StringBuilder();
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            return response.toString();
-        }
+        return sendRequest(String.format("%saccounts/%s/balances", isSandbox ? sandboxURL : prodURL, accountID));
     }
 
     public RevolutBalance getBalance(String accountID) throws IOException {
-        return RevolutRowMapper.getBalance(getBalanceRaw(accountID));
+        return rowMapper.getBalance(rowMapper.parse(getBalanceRaw(accountID)));
     }
 
     public String getBeneficiariesRaw(String accountID) throws IOException {
-        URL url = new URL(String.format("%saccounts/%s/beneficiaries", isSandbox ? sandboxURL : prodURL, accountID));
+        return sendRequest(String.format("%saccounts/%s/beneficiaries", isSandbox ? sandboxURL : prodURL, accountID));
+    }
+
+    public List<RevolutBeneficiary> getBeneficiaries(String accountID) throws IOException {
+        return rowMapper.getBeneficiaries(rowMapper.parse(getBeneficiariesRaw(accountID)));
+    }
+
+    public String sendRequest(String link) throws IOException {
+        URL url = new URL(link);
         HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         connection.setRequestProperty("Authorization", "Bearer " + accessToken);
@@ -637,10 +604,6 @@ public class RevolutAPI {
             }
             return response.toString();
         }
-    }
-
-    public List<RevolutBeneficiary> getBeneficiaries(String accountID) throws IOException {
-        return RevolutRowMapper.getBeneficiaries(getBeneficiariesRaw(accountID));
     }
 
     public String getAccessToken() {

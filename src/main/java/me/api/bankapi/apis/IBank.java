@@ -6,7 +6,4 @@ public abstract class IBank {
 
     private final SupportedBanks name = SupportedBanks.UNKNOWN;
 
-
-
-
 }
