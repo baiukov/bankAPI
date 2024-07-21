@@ -43,7 +43,7 @@ public class RevolutRowMapper {
         return StreamSupport.stream(accountObjects.spliterator(), false)
                 .map(JSONObject.class::cast)
                 .map(object -> RevolutAccountDetails.builder()
-                        .schemeName(object.getString("SchemeName"))
+                        .schemeName(RevolutAccountSchemeNames.from(object.getString("SchemeName")))
                         .identification(object.getString("Identification"))
                         .name(object.getString("Name"))
                         .secondaryIdentification(object.has("SecondaryIdentification") ?
@@ -81,7 +81,7 @@ public class RevolutRowMapper {
                         jsonObject.getString("AccountId"),
                         jsonObject.getString("BeneficiaryId"),
                         jsonObject.has("CreditorAccount") ? RevolutCreditorAccount.builder()
-                                .schemeName(CreditorAccountSchemeNames.from(
+                                .schemeName(RevolutAccountSchemeNames.from(
                                         jsonObject.getJSONObject("CreditorAccount").getString("SchemeName")))
                                 .identification(jsonObject.getJSONObject("CreditorAccount")
                                         .getString("Identification"))

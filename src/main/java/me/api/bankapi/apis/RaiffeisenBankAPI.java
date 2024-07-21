@@ -1,9 +1,6 @@
 package me.api.bankapi.apis;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -63,5 +60,9 @@ public class RaiffeisenBankAPI {
         JSONObject balanceInfo = new JSONObject(response.body());
 
         System.out.println("Account Balance: " + balanceInfo.toString(2));
+    }
+
+    private static void getAccount() {
+
     }
 }
