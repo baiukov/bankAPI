@@ -25,7 +25,7 @@ public enum RevolutAccountSchemeNames {
         this.name = name;
     }
 
-    String getName() { return name; }
+    public String getName() { return name; }
 
     /**
      * Method which finds a value by raw string
@@ -35,7 +35,7 @@ public enum RevolutAccountSchemeNames {
      */
     public static RevolutAccountSchemeNames from(String value) {
         return Arrays.stream(RevolutAccountSchemeNames.values())
-                .filter(v -> v.name().equals(value))
+                .filter(v -> v.getName().equals(value))
                 .findFirst()
                 .orElse(null);
     }

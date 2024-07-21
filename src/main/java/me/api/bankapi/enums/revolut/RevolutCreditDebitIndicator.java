@@ -19,7 +19,7 @@ public enum RevolutCreditDebitIndicator {
         this.name = name;
     }
 
-    String getName() { return name; }
+    public String getName() { return name; }
 
     /**
      * Method which finds a value by raw string
@@ -29,7 +29,7 @@ public enum RevolutCreditDebitIndicator {
      */
     public static RevolutCreditDebitIndicator from(String value) {
         return Arrays.stream(RevolutCreditDebitIndicator.values())
-                .filter(v -> v.name().equals(value))
+                .filter(v -> v.getName().equals(value))
                 .findFirst()
                 .orElse(null);
     }

@@ -20,7 +20,7 @@ public enum RevolutAccountSubTypes {
         this.name = name;
     }
 
-    String getName() { return name; }
+    public String getName() { return name; }
 
     /**
      * Method which finds a value by raw string
@@ -30,7 +30,7 @@ public enum RevolutAccountSubTypes {
      */
     public static RevolutAccountSubTypes from(String value) {
         return Arrays.stream(RevolutAccountSubTypes.values())
-                .filter(v -> v.name().equals(value))
+                .filter(v -> v.getName().equals(value))
                 .findFirst()
                 .orElse(null);
     }

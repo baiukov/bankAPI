@@ -19,7 +19,7 @@ public enum RevolutAccountTypes {
         this.name = name;
     }
 
-    String getName() { return name; }
+    public String getName() { return name; }
 
     /**
      * Method which finds a value by raw string
@@ -29,7 +29,7 @@ public enum RevolutAccountTypes {
      */
     public static RevolutAccountTypes from(String value) {
         return Arrays.stream(RevolutAccountTypes.values())
-                .filter(v -> v.name().equals(value))
+                .filter(v -> v.getName().equals(value))
                 .findFirst()
                 .orElse(null);
     }

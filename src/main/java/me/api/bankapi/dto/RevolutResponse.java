@@ -1,9 +1,6 @@
 package me.api.bankapi.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.json.JSONObject;
 
 /**
@@ -17,6 +14,8 @@ import org.json.JSONObject;
 @Setter
 @AllArgsConstructor
 @Builder(toBuilder = true)
+@EqualsAndHashCode
+@ToString
 public class RevolutResponse {
 
     /**

@@ -15,6 +15,7 @@ import me.api.bankapi.enums.revolut.RevolutAccountSchemeNames;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 @ToString
+@EqualsAndHashCode
 public class RevolutAccountDetails {
 
     /**

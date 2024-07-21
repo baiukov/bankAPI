@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 @ToString
+@EqualsAndHashCode
 public class RevolutBalance {
 
     /**

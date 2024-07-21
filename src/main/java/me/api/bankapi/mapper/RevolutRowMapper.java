@@ -59,7 +59,7 @@ public class RevolutRowMapper {
                 .map(jsonObject -> RevolutBalance.builder()
                         .accountID(jsonObject.getString("AccountId"))
                         .amount(new RevolutBalanceAmount(
-                                jsonObject.getJSONObject("Amount").getString("Amount"),
+                                jsonObject.getJSONObject("Amount").getDouble("Amount"),
                                 jsonObject.getJSONObject("Amount").getString("Currency")))
                         .creditDebitIndicator(RevolutCreditDebitIndicator.from(
                                 jsonObject.getString("CreditDebitIndicator")))

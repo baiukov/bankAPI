@@ -1,9 +1,6 @@
 package me.api.bankapi.model.revolut;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 /**
  *
@@ -16,6 +13,7 @@ import lombok.ToString;
 @Setter
 @AllArgsConstructor
 @ToString
+@EqualsAndHashCode
 public class RevolutBeneficiary {
 
     /**

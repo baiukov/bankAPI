@@ -19,6 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 @ToString
+@EqualsAndHashCode
 public class RevolutAccount {
 
     /**

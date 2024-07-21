@@ -1,9 +1,6 @@
 package me.api.bankapi.model.revolut;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 /**
  *
@@ -16,12 +13,13 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
+@EqualsAndHashCode
 public class RevolutBalanceAmount {
 
     /**
      * The amount of money.
      */
-    private String amount;
+    private Double amount;
 
     /**
      * ISO 4217 currency code in upper case.
