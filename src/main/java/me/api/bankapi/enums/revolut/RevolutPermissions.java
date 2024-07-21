@@ -1,5 +1,13 @@
 package me.api.bankapi.enums.revolut;
 
+/**
+ * Before you can access any data from a Revolut user, you must create an access consent to
+ * read data from the user's profile.
+ * The enum which represents available permissions
+ *
+ * @author Aleksei Baiukov
+ * @version 21.07.2024
+ */
 public enum RevolutPermissions {
 
     READ_ACCOUNT_BASIC("ReadAccountsBasic"),

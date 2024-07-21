@@ -1,5 +1,6 @@
 package me.api.bankapi.mapper;
 
+import me.api.bankapi.dto.RevolutResponse;
 import me.api.bankapi.enums.revolut.*;
 import me.api.bankapi.model.revolut.*;
 import org.json.JSONArray;
@@ -11,9 +12,19 @@ import java.util.List;
 import java.util.stream.StreamSupport;
 
 public class RevolutRowMapper {
-    public static List<RevolutAccount> getAccounts(String raw) {
+
+    public RevolutResponse parse(String raw) {
         JSONObject dto = new JSONObject(raw);
-        JSONArray jsonAccounts = dto.getJSONObject("Data").getJSONArray("Account");
+        return RevolutResponse.builder()
+                .data(dto.getJSONObject("Data"))
+                .risk(dto.has("Risk") ? dto.getJSONObject("Risk") : null)
+                .links(dto.getJSONObject("Links"))
+                .meta(dto.getJSONObject("Meta"))
+                .build();
+    }
+
+    public List<RevolutAccount> getAccounts(RevolutResponse response) {
+        JSONArray jsonAccounts = response.getData().getJSONArray("Account");
         return StreamSupport.stream(jsonAccounts.spliterator(), false)
                 .map(JSONObject.class::cast)
                 .map(jsonObject -> RevolutAccount.builder()
@@ -28,11 +39,11 @@ public class RevolutRowMapper {
                 .toList();
     }
 
-    public static List<RevolutAccountDetails> getAccountDetails(JSONArray accountObjects) {
+    public List<RevolutAccountDetails> getAccountDetails(JSONArray accountObjects) {
         return StreamSupport.stream(accountObjects.spliterator(), false)
                 .map(JSONObject.class::cast)
                 .map(object -> RevolutAccountDetails.builder()
-                        .schemeName(object.getString("SchemeName"))
+                        .schemeName(RevolutAccountSchemeNames.from(object.getString("SchemeName")))
                         .identification(object.getString("Identification"))
                         .name(object.getString("Name"))
                         .secondaryIdentification(object.has("SecondaryIdentification") ?
@@ -41,15 +52,14 @@ public class RevolutRowMapper {
                 .toList();
     }
 
-    public static RevolutBalance getBalance(String raw) {
-        JSONObject dto = new JSONObject(raw);
-        JSONArray jsonObjects = dto.getJSONObject("Data").getJSONArray("Balance");
+    public RevolutBalance getBalance(RevolutResponse response) {
+        JSONArray jsonObjects = response.getData().getJSONArray("Balance");
         return StreamSupport.stream(jsonObjects.spliterator(), false)
                 .map(JSONObject.class::cast)
                 .map(jsonObject -> RevolutBalance.builder()
                         .accountID(jsonObject.getString("AccountId"))
                         .amount(new RevolutBalanceAmount(
-                                jsonObject.getJSONObject("Amount").getString("Amount"),
+                                jsonObject.getJSONObject("Amount").getDouble("Amount"),
                                 jsonObject.getJSONObject("Amount").getString("Currency")))
                         .creditDebitIndicator(RevolutCreditDebitIndicator.from(
                                 jsonObject.getString("CreditDebitIndicator")))
@@ -63,16 +73,15 @@ public class RevolutRowMapper {
                 .orElse(null);
     }
 
-    public static List<RevolutBeneficiary> getBeneficiaries(String raw) {
-        JSONObject dto = new JSONObject(raw);
-        JSONArray jsonObjects = dto.getJSONObject("Data").getJSONArray("Beneficiary");
+    public List<RevolutBeneficiary> getBeneficiaries(RevolutResponse response) {
+        JSONArray jsonObjects = response.getData().getJSONArray("Beneficiary");
         return StreamSupport.stream(jsonObjects.spliterator(), false)
                 .map(JSONObject.class::cast)
                 .map(jsonObject -> new RevolutBeneficiary(
                         jsonObject.getString("AccountId"),
                         jsonObject.getString("BeneficiaryId"),
                         jsonObject.has("CreditorAccount") ? RevolutCreditorAccount.builder()
-                                .schemeName(CreditorAccountSchemeNames.from(
+                                .schemeName(RevolutAccountSchemeNames.from(
                                         jsonObject.getJSONObject("CreditorAccount").getString("SchemeName")))
                                 .identification(jsonObject.getJSONObject("CreditorAccount")
                                         .getString("Identification"))
